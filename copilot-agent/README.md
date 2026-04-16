@@ -1,12 +1,43 @@
 # copilot-agent
 
-Portable Copilot GPT-Codex agent configuration, ported from the claw-code agent system.
+A self-contained, portable agent configuration folder for Copilot GPT-Codex agent mode.
 
-Drop this folder into any repository to get the same instruction hierarchy, skill catalog,
-agent role playbooks, and config defaults that claw-code uses — without needing the
-`claw` CLI binary.
+Copy this folder into any repository to get a ready-to-use instruction hierarchy, skill catalog,
+agent role playbooks, and config defaults — no CLI binary required, no dependency on the
+source repository.
 
-## How to use
+## Quick start
+
+```bash
+# From the root of any repo you want to set up:
+bash copilot-agent/install.sh
+```
+
+`install.sh` is idempotent and handles all wiring automatically.  See [Manual setup](#manual-setup)
+below if you prefer step-by-step control.
+
+---
+
+## What's inside
+
+| Path | Purpose |
+|---|---|
+| `install.sh` | Idempotent setup script — run this in any new repo |
+| `instructions/AGENTS.md` | Project-level system instructions template (committed) |
+| `instructions/local.md` | Local override template (gitignored per user) |
+| `skills/review/SKILL.md` | Code-review skill playbook |
+| `skills/plan/SKILL.md` | Planning / ultraplan skill playbook |
+| `skills/security-review/SKILL.md` | Security review skill playbook |
+| `agents/architect.md` | Architect role — design and decomposition |
+| `agents/implementer.md` | Implementer role — tightly-scoped code changes |
+| `agents/reviewer.md` | Reviewer role — quality gate and feedback |
+| `config/settings.json` | Copilot agent config defaults template |
+| `config/hooks.md` | Hook pipeline documentation |
+| `.gitignore` | Gitignore template (excludes local override files) |
+
+---
+
+## Manual setup
 
 ### 1. Copy this folder into your target repo
 
@@ -17,15 +48,16 @@ cp -r copilot-agent/ /path/to/your-repo/
 ### 2. Wire up project-level instructions
 
 Copilot agent mode reads instructions from `AGENTS.md` at the repository root (and ancestor
-directories). Copy or symlink the team baseline:
+directories). Copy the template:
 
 ```bash
 cp copilot-agent/instructions/AGENTS.md AGENTS.md
 ```
 
-Edit `AGENTS.md` to reflect the target repo's stack, verification commands, and working
-agreement. The file is intentionally structured to match the sections Claw's `/init`
-template produces.
+Open `AGENTS.md` and fill in:
+- The language / framework stack (the `## Detected stack` section)
+- The real lint / build / test commands (the `## Verification` section)
+- The repository layout (the `## Repository shape` section)
 
 ### 3. Add a local override (optional)
 
@@ -36,27 +68,20 @@ cp copilot-agent/instructions/local.md AGENTS.local.md
 echo "AGENTS.local.md" >> .gitignore
 ```
 
-### 4. Install skills
+### 4. Use skills
 
-Each subdirectory under `skills/` is a self-contained skill playbook. Invoke them by
-mentioning the skill name in your Copilot prompt:
+Each subdirectory under `skills/` is a self-contained skill playbook. Reference them in
+your Copilot prompt:
 
 ```
 Run the "review" skill on my last set of changes.
+Run the "security-review" skill on src/auth/.
+Run the "plan" skill and give me a task breakdown for X.
 ```
 
-Skills translate directly from Claw's `SKILL.md` format. The folder layout is:
+### 5. Use agent roles
 
-```
-skills/
-  <skill-name>/
-    SKILL.md        # frontmatter (name, description) + prompt body
-```
-
-### 5. Use agent role definitions
-
-The `agents/` folder contains role-scoped instruction files for multi-step tasks.
-Reference a role when starting a long-running task:
+The `agents/` folder contains role-scoped instruction files for multi-step tasks:
 
 ```
 Act as the Architect role (see copilot-agent/agents/architect.md) and design
@@ -65,36 +90,17 @@ the migration plan for X.
 
 ### 6. Apply config defaults
 
-`config/settings.json` is a drop-in template for `.claw.json` / `.claw/settings.json`
-if you are also using the `claw` CLI. For pure Copilot usage it documents the intended
-permission and hook defaults as comments.
+Copy `config/settings.json` to the repo root as `.copilot-agent.json` and edit to taste.
+See `config/hooks.md` for hook pipeline documentation and GitHub Actions equivalents.
 
 ---
 
-## Folder map
+## Instruction file precedence
 
-| Path | Purpose |
-|---|---|
-| `instructions/AGENTS.md` | Project-level system instructions (committed) |
-| `instructions/local.md` | Local override template (gitignored per user) |
-| `skills/review/SKILL.md` | Code-review skill playbook |
-| `skills/plan/SKILL.md` | Planning / ultraplan skill playbook |
-| `skills/security-review/SKILL.md` | Security review skill playbook |
-| `agents/architect.md` | Architect role — design and decomposition |
-| `agents/implementer.md` | Implementer role — tightly-scoped code changes |
-| `agents/reviewer.md` | Reviewer role — quality gate and feedback |
-| `config/settings.json` | Config defaults template |
-| `config/hooks.md` | Hook pipeline documentation |
+Copilot resolves instruction files from the innermost directory outward:
 
-## Relationship to claw-code
+1. `AGENTS.md` at repo root — committed team baseline
+2. `AGENTS.local.md` at repo root — machine-local overrides (gitignored)
+3. Subdirectory `AGENTS.md` files — module-level guidance
 
-| claw-code concept | Copilot equivalent in this folder |
-|---|---|
-| `CLAUDE.md` discovered by `prompt.rs` | `AGENTS.md` at repo root |
-| `.claw/instructions.md` | `instructions/AGENTS.md` (same content, different path) |
-| `.claw/agents/<name>.toml` | `agents/<role>.md` |
-| `.claw/skills/<name>/SKILL.md` | `skills/<name>/SKILL.md` (identical format) |
-| `.claw.json` / `.claw/settings.json` | `config/settings.json` |
-| Pre/PostToolUse hooks | `config/hooks.md` + CI workflow steps |
-| OmX planning loop | `skills/plan/SKILL.md` + PR workflow |
-| clawhip notification routing | GitHub notification settings + PR assignments |
+Later (more specific) files take precedence over earlier (more general) ones.

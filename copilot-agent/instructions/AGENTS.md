@@ -1,34 +1,39 @@
 # AGENTS.md
 
 This file provides instructions to Copilot GPT-Codex agent mode when working with code
-in this repository.  Edit the sections below to reflect the actual stack, commands, and
-conventions of your project.
+in this repository.  Fill in the placeholder sections below to reflect the actual stack,
+commands, and conventions of your project.
 
 ---
 
 ## Detected stack
 
-- Languages: <!-- e.g. Rust, Python, TypeScript -->
-- Frameworks: <!-- e.g. Next.js, React, NestJS, or "none detected" -->
+- Languages: <!-- TODO: e.g. Rust, Python, TypeScript, Go -->
+- Frameworks: <!-- TODO: e.g. Next.js, React, Django, or "none" -->
+- Package manager: <!-- TODO: e.g. npm, cargo, pip, go modules -->
 
 ## Verification
 
-Run these commands before shipping any change:
+Replace the commands below with the real lint/build/test commands for this repo.
 
 ```bash
-# Replace with the repo's real commands
-cargo fmt
-cargo clippy --workspace --all-targets -- -D warnings
-cargo test --workspace
+# TODO: replace with this repo's actual commands
+# Examples by ecosystem:
+#   Node / TypeScript:  npm run lint && npm run build && npm test
+#   Python:             ruff check . && pytest
+#   Rust:               cargo fmt --check && cargo clippy -- -D warnings && cargo test
+#   Go:                 go vet ./... && go test ./...
+echo "configure verification commands in AGENTS.md"
 ```
 
-- `src/` and `tests/` are both present; update both surfaces together when behavior changes.
+- Tests and source files should be kept in sync; update both surfaces together when behavior changes.
 
 ## Repository shape
 
-- `src/` — primary source tree
-- `tests/` — validation surfaces; review alongside code changes
-- `docs/` — documentation; update when public APIs or behaviour change
+<!-- TODO: describe the layout of this repo -->
+- `src/` — primary source tree (rename/remove if not applicable)
+- `tests/` — validation surfaces; review alongside code changes (rename/remove if not applicable)
+- `docs/` — documentation; update when public APIs or behavior change (remove if not applicable)
 
 ## Working agreement
 

@@ -1,13 +1,13 @@
 {
-  "_comment": "Drop this into .claw.json or .claw/settings.json for claw CLI use. For pure Copilot usage, treat this as documentation of the intended defaults.",
+  "_comment": "Copilot agent configuration defaults. Copy to .copilot-agent.json at the repo root and edit to taste.",
   "permissions": {
     "defaultMode": "dontAsk",
     "_comment_defaultMode": "Options: dontAsk | ask | denyAll. dontAsk allows workspace-write without prompts; use ask for higher-blast-radius repos."
   },
   "model": "claude-sonnet-4-6",
-  "_comment_model": "Override with any alias or full model name. Aliases: opus, sonnet, haiku, grok, grok-mini.",
+  "_comment_model": "Override with any model alias or full model name supported by your Copilot plan.",
   "hooks": {
-    "_comment": "Hooks run shell scripts at agent lifecycle points. Paths are relative to the repo root.",
+    "_comment": "Hooks run shell scripts at agent lifecycle points. Paths are relative to the repo root. See config/hooks.md for details.",
     "PreToolUse": [],
     "PostToolUse": [],
     "PostToolUseFailure": []

@@ -1,24 +1,25 @@
 # Hook Pipeline
 
-Hooks are shell scripts that the `claw` CLI (and optionally CI workflows) fire at
-specific agent lifecycle points.  In a pure Copilot codespace you replace hooks with
-equivalent GitHub Actions steps or pre-commit checks.
+Hooks are shell scripts fired at specific agent lifecycle points.  Register them in
+`.copilot-agent.json` (see `config/settings.json`) to run before or after any agent
+tool call.  In a pure Copilot / CI environment you can replicate the same gates with
+GitHub Actions steps or pre-commit checks.
 
 ## Lifecycle points
 
-| Hook | Claw event | Copilot / CI equivalent |
+| Hook | When it fires | GitHub Actions / CI equivalent |
 |---|---|---|
 | `PreToolUse` | Before the agent executes any tool call | Pre-commit hook, branch protection check |
 | `PostToolUse` | After a successful tool call | Post-merge CI job, status check |
 | `PostToolUseFailure` | After a failed tool call | CI failure notification, Slack/Discord alert |
-| `Init` (plugin) | Session startup | `workflow_dispatch` trigger, dev container `postStartCommand` |
-| `Shutdown` (plugin) | Session teardown | Post-session summary job |
+| `Init` | Session startup | `workflow_dispatch` trigger, dev container `postStartCommand` |
+| `Shutdown` | Session teardown | Post-session summary job |
 
-## How to add a hook (claw CLI)
+## How to add a hook
 
 1. Create a shell script, for example `scripts/hooks/pre.sh`.
 2. Make it executable: `chmod +x scripts/hooks/pre.sh`.
-3. Register it in `.claw/settings.json`:
+3. Register it in `.copilot-agent.json`:
 
 ```json
 {
@@ -33,7 +34,7 @@ The script receives a JSON blob on stdin describing the tool call:
 ```json
 {
   "tool": "bash",
-  "input": { "command": "cargo test" },
+  "input": { "command": "npm test" },
   "session_id": "..."
 }
 ```
@@ -46,6 +47,7 @@ Exit code 0 → allow.  Any non-zero exit → block the tool call and report the
 
 ```yaml
 # .github/workflows/safety-gate.yml
+# TODO: replace the run commands with this repo's real lint/build/test commands
 on: [pull_request]
 jobs:
   safety:
@@ -53,14 +55,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Lint
-        run: cargo clippy --workspace --all-targets -- -D warnings
+        run: echo "TODO: add lint command"
       - name: Test
-        run: cargo test --workspace
+        run: echo "TODO: add test command"
       - name: Security scan
-        run: cargo audit  # or your preferred scanner
+        run: echo "TODO: add security scan command"
 ```
 
-### Post-merge notification (clawhip equivalent)
+### Post-merge notification
 
 ```yaml
 # .github/workflows/notify.yml
@@ -80,7 +82,7 @@ jobs:
 
 ## Sample hook scripts
 
-### Pre-tool: block commits to protected paths
+### Pre-tool: block writes to protected paths
 
 ```bash
 #!/usr/bin/env bash
@@ -103,6 +105,7 @@ exit 0
 #!/usr/bin/env bash
 # scripts/hooks/post.sh
 INPUT=$(cat)
-echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) tool_used: $(echo "$INPUT" | jq -r '.tool')" >> .claw/audit.log
+mkdir -p .copilot-agent
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) tool_used: $(echo "$INPUT" | jq -r '.tool')" >> .copilot-agent/audit.log
 exit 0
 ```
