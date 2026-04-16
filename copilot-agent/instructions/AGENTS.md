@@ -22,7 +22,7 @@ cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
 ```
 
-- `src/` and `tests/` are both present; update both surfaces together when behaviour changes.
+- `src/` and `tests/` are both present; update both surfaces together when behavior changes.
 
 ## Repository shape
 
