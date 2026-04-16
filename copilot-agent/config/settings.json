@@ -1,0 +1,19 @@
+{
+  "_comment": "Drop this into .claw.json or .claw/settings.json for claw CLI use. For pure Copilot usage, treat this as documentation of the intended defaults.",
+  "permissions": {
+    "defaultMode": "dontAsk",
+    "_comment_defaultMode": "Options: dontAsk | ask | denyAll. dontAsk allows workspace-write without prompts; use ask for higher-blast-radius repos."
+  },
+  "model": "claude-sonnet-4-6",
+  "_comment_model": "Override with any alias or full model name. Aliases: opus, sonnet, haiku, grok, grok-mini.",
+  "hooks": {
+    "_comment": "Hooks run shell scripts at agent lifecycle points. Paths are relative to the repo root.",
+    "PreToolUse": [],
+    "PostToolUse": [],
+    "PostToolUseFailure": []
+  },
+  "mcp": {
+    "_comment": "Add MCP server definitions here. Each key is a logical server name.",
+    "servers": {}
+  }
+}
